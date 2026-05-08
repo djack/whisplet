@@ -1,0 +1,12 @@
+# Build
+cmake-build-*/
+build/
+
+# Models (large binary files)
+models/
+
+# CLion
+.idea/
+
+# macOS
+.DS_Store
