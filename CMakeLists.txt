@@ -24,12 +24,10 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(whisper_cpp)
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(PORTAUDIO REQUIRED portaudio-2.0)
+pkg_check_modules(PORTAUDIO REQUIRED IMPORTED_TARGET portaudio-2.0)
 
 add_executable(whisplet main.cpp)
-target_include_directories(whisplet PRIVATE ${PORTAUDIO_INCLUDE_DIRS})
-target_link_libraries(whisplet PRIVATE whisper ${PORTAUDIO_LIBRARIES})
-target_compile_options(whisplet PRIVATE ${PORTAUDIO_CFLAGS_OTHER})
+target_link_libraries(whisplet PRIVATE whisper PkgConfig::PORTAUDIO)
 
 if(APPLE)
     target_link_libraries(whisplet PRIVATE

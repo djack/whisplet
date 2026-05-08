@@ -40,6 +40,8 @@ jobs:
 
       - name: Build
         run: make
+        env:
+          VULKAN_SDK: /usr
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
