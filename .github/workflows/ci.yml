@@ -22,6 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Cache whisper.cpp build
+        uses: actions/cache@v5
+        with:
+          path: build/_deps
+          key: deps-${{ matrix.os }}-${{ hashFiles('CMakeLists.txt') }}
+
       - name: Install deps (Linux)
         if: runner.os == 'Linux'
         run: |
