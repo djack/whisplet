@@ -31,16 +31,17 @@ jobs:
       - name: Install deps (Linux)
         if: runner.os == 'Linux'
         run: |
+          # Install libvulkan-dev from Ubuntu repos before LunarG PPA can interfere
+          sudo apt-get install -y \
+            portaudio19-dev libx11-dev libvulkan-dev \
+            glslang-tools spirv-headers pkg-config
+          # Add LunarG PPA only for glslc (shaderc) — not available in Ubuntu repos
           wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc \
             | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
           sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-jammy.list \
             https://packages.lunarg.com/vulkan/lunarg-vulkan-jammy.list
           sudo apt-get update -q
-          sudo apt-get install -y \
-            portaudio19-dev libx11-dev \
-            glslang-tools spirv-headers shaderc pkg-config
-          # Install libvulkan-dev last — shaderc from LunarG can displace the headers
-          sudo apt-get install -y libvulkan-dev
+          sudo apt-get install -y shaderc
 
       - name: Install deps (macOS)
         if: runner.os == 'macOS'
