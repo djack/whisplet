@@ -37,8 +37,10 @@ jobs:
             https://packages.lunarg.com/vulkan/lunarg-vulkan-jammy.list
           sudo apt-get update -q
           sudo apt-get install -y \
-            portaudio19-dev libx11-dev libvulkan-dev \
+            portaudio19-dev libx11-dev \
             glslang-tools spirv-headers shaderc pkg-config
+          # Install libvulkan-dev last — shaderc from LunarG can displace the headers
+          sudo apt-get install -y libvulkan-dev
 
       - name: Install deps (macOS)
         if: runner.os == 'macOS'
