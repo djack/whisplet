@@ -188,20 +188,30 @@ static void run_event_loop(Capture &cap, whisper_context *ctx) {
     g_cap = &cap;
     g_ctx = ctx;
 
+    if (!AXIsProcessTrusted()) {
+        fprintf(stderr,
+                "Accessibility permission not granted.\n"
+                "System Settings → Privacy & Security → Accessibility → add this app.\n"
+                "Then re-launch whisplet.\n");
+        exit(1);
+    }
+
     CGEventMask   mask = CGEventMaskBit(kCGEventKeyDown) | CGEventMaskBit(kCGEventKeyUp);
     CFMachPortRef tap  = CGEventTapCreate(kCGSessionEventTap, kCGHeadInsertEventTap,
                                           kCGEventTapOptionDefault, mask, event_tap_cb, nullptr);
     if (tap == nullptr) {
-        fprintf(
-            stderr,
-            "Failed to create event tap.\n"
-            "Grant Accessibility access: System Settings → Privacy & Security → Accessibility\n");
+        fprintf(stderr, "Failed to create event tap — check Accessibility permission.\n");
         exit(1);
     }
 
     CFRunLoopSourceRef src = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0);
     CFRunLoopAddSource(CFRunLoopGetCurrent(), src, kCFRunLoopCommonModes);
     CGEventTapEnable(tap, true);
+
+    if (!CGEventTapIsEnabled(tap)) {
+        fprintf(stderr, "Event tap disabled after creation — check Accessibility permission.\n");
+        exit(1);
+    }
 
     printf("Ready. Hold F9 to record, release to transcribe.\n");
     CFRunLoopRun();

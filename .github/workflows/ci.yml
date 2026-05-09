@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
             artifact: whisplet-linux-x86_64
           - os: macos-15
             artifact: whisplet-macos-arm64
@@ -26,30 +26,18 @@ jobs:
         uses: actions/cache@v5
         with:
           path: build/_deps
-          key: deps-v2-${{ matrix.os }}-${{ hashFiles('CMakeLists.txt') }}
+          key: deps-v3-${{ matrix.os }}-${{ hashFiles('CMakeLists.txt') }}
 
       - name: Install deps (Linux)
         if: runner.os == 'Linux'
         run: |
-          # Install libvulkan-dev from Ubuntu repos before LunarG PPA can interfere
           sudo apt-get install -y \
             portaudio19-dev libx11-dev libvulkan-dev \
-            glslang-tools spirv-headers pkg-config
-          # Add LunarG PPA only for glslc (shaderc) — not available in Ubuntu repos
-          wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc \
-            | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
-          sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-jammy.list \
-            https://packages.lunarg.com/vulkan/lunarg-vulkan-jammy.list
-          sudo apt-get update -q
-          sudo apt-get install -y shaderc
+            shaderc glslang-tools spirv-headers pkg-config
 
       - name: Install deps (macOS)
         if: runner.os == 'macOS'
         run: brew install portaudio pkg-config
-
-      - name: Verify Vulkan headers
-        if: runner.os == 'Linux'
-        run: find /usr /usr/local -name vulkan_core.h 2>/dev/null
 
       - name: Build (Linux)
         if: runner.os == 'Linux'
